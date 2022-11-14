@@ -15,7 +15,7 @@ import Tweet from "./pages/Tweet";
 import UserProfile from "./pages/UserProfile";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:4000",
+  uri: `${process.env.REACT_APP_SERVER_URl}`,
 });
 
 const authLink = setContext(async (req, { headers }) => {

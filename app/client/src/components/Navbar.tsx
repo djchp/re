@@ -112,7 +112,7 @@ const Navbar = () => {
         <Stack as={Flex} alignContent="center" w={`${navbarIcons ? "205px" : null}`}>
           <Link
             as={RouterLink}
-            to="/home"
+            to="/"
             w="max-content"
             _hover={{ backgroundColor: "rgb(212, 216, 217)" }}
             transition="all 0.1s linear"

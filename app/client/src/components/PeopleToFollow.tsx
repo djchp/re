@@ -46,7 +46,7 @@ const PeopleToFollow = () => {
       <Text as="b" fontSize="22px" padding="12px 16px 4px 16px">
         Who to follow
       </Text>
-      {data.userstofollow.map((u: User) => (
+      {data.userstofollow.map((u: User, i: number) => (
         <HStack
           padding="6px 16px 6px 16px"
           _hover={{ backgroundColor: "rgb(186, 186, 186)" }}
@@ -54,6 +54,7 @@ const PeopleToFollow = () => {
           onClick={() => {
             navigate(`/profile/${u.name}`)
           }}
+          key={i}
         >
           <Image src={u.Profile?.photo} boxSize="48px" borderRadius="full" />
 
