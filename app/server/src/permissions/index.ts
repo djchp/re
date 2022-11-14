@@ -32,4 +32,4 @@ export const permissions = shield({
     // incrementPostViewCount: rules.isAuthenticatedUser,
     // togglePublishPost: rules.isPostOwner,
   },
-})
+}, {allowExternalErrors: true})
