@@ -7,8 +7,8 @@ import http from 'http'
 import cors from 'cors'
 
 const app = express()
-app.use(cors({origin: ['https://react-site-tb37.onrender.com/']}))
-// app.use(cors())
+app.use(cors({origin: 'https://react-site-tb37.onrender.com'}))
+// app.use(cors({origin: 'http://localhost:3000'}))
 
 const startServer = async () => {
   const httpServer = http.createServer(app)
