@@ -68,7 +68,7 @@ const Auth = () => {
             });
             localStorage.setItem("token", response.data.signup.token);
             setSubmitting(false);
-            navigate("/");
+            navigate("/cp");
           }}
         >
           <VStack as={Form} m="auto" justify="center">

@@ -13,6 +13,7 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import Profile from "./pages/Profile";
 import Tweet from "./pages/Tweet";
 import UserProfile from "./pages/UserProfile";
+import CreateProfile from "./pages/CreateProfile";
 
 const httpLink = createHttpLink({
   uri: `${process.env.REACT_APP_SERVER_URl}`,
@@ -44,6 +45,7 @@ function App() {
           <Route path="/login" />
           <Route element={<ProtectedRoutes />}>
             <Route path="/users" element={<Users />} />
+            <Route path="/cp" element={<CreateProfile />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:profileName" element={<UserProfile />} />
             <Route path="/tweet/:tid" element={<Tweet />} />

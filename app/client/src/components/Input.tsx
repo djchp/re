@@ -12,15 +12,15 @@ type InputProps = {
   name: string;
   type?: string;
   placeholder?: string;
-
+  defaultValue?: string;
 };
-const TextInput = ({ label, ...props }: InputProps) => {
+const TextInput = ({ label, defaultValue, ...props }: InputProps) => {
   const [field, meta] = useField(props);
 
   return (
     <FormControl w="20rem">
       <FormLabel>{label}</FormLabel>
-      <Input as={Field} {...field} {...props}/>
+      <Input as={Field} {...field} {...props} />
       <FormErrorMessage>{meta.error}</FormErrorMessage>
     </FormControl>
   );
