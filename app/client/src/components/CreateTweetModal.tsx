@@ -54,13 +54,14 @@ const CreateTweetModal = ({ isOpen, onClose }: Props) => {
         <ModalHeader></ModalHeader>
         <Formik
           initialValues={InitialValues}
-          onSubmit={async (values, { setSubmitting }) => {
+          onSubmit={async (values, { setSubmitting, resetForm }) => {
             setSubmitting(true);
             const response = await createTweet({
               variables: values,
             });
 
             setSubmitting(false);
+            resetForm({values: InitialValues})
           }}
         >
           <Stack as={Form} justify="center">

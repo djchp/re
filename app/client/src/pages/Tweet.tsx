@@ -20,7 +20,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { formatDistance, formatRelative, subDays } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CreateReply, { CREATE_REPLY } from "../components/CreateReply";
 import DeleteButton from "../components/DeleteButton";
@@ -30,6 +30,7 @@ import { FETCH_ME } from "./Profile";
 import { TweetInput } from "../components/TweetInput";
 import { Form, Formik } from "formik";
 import CreateReplyInTweetPage from "../components/CreateReplyInTweetPage";
+import Trends from "../components/Trends";
 
 export const TWEET_QUERY = gql`
   query tweet($tweetId: Int) {
@@ -99,14 +100,18 @@ interface Reply {
 const Tweet = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { tid } = useParams();
-  let a = "";
   const { data, loading, error } = useQuery(TWEET_QUERY, {
-    variables: { tweetId: Number(tid) },
+    variables: { tweetId: parseInt(tid!) },
+    fetchPolicy: "cache-and-network",
   });
   const InitialValues: InitialValues = {
     body: "",
   };
-  const [createReply] = useMutation(CREATE_REPLY);
+  const [createReply] = useMutation(CREATE_REPLY, {
+    refetchQueries: [
+      { query: TWEET_QUERY, variables: { tweetId: parseInt(tid!) } },
+    ],
+  });
   const {
     data: meData,
     loading: meLoading,
@@ -290,13 +295,14 @@ const Tweet = () => {
             <Stack borderBottom="1px solid rgb(239, 243, 244)">
               <Formik
                 initialValues={InitialValues}
-                onSubmit={async (values, { setSubmitting }) => {
+                onSubmit={async (values, { setSubmitting,resetForm }) => {
                   setSubmitting(true);
                   await createReply({
                     variables: { ...values, tweetId: Number(tid) },
                   });
 
                   setSubmitting(false);
+                  resetForm({values: InitialValues})
                 }}
               >
                 <Stack as={Form}>
@@ -420,7 +426,7 @@ const Tweet = () => {
             </Stack>
           </GridItem>
           <GridItem area={`Trends`}>
-            <p>trends</p>
+            <Trends />
           </GridItem>
         </Grid>
       </>
@@ -477,6 +483,234 @@ const Tweet = () => {
                 Tweet
               </Heading>
             </Stack>
+          </Stack>
+          <Stack as={Flex} flexDir="column">
+            <Stack padding="0 16px 0 16px">
+              <HStack>
+                <Image
+                  src={data.tweet.author.Profile.photo}
+                  alt="Author photo"
+                  boxSize="50px"
+                  borderRadius="full"
+                />
+                <Stack as={Flex} flexDir="column">
+                  <Text
+                    as="b"
+                    fontSize="17px"
+                    onClick={() => {
+                      navigate(`/profile/${data.tweet.author.name}`);
+                    }}
+                    cursor="pointer"
+                  >
+                    {data.tweet.author.name}
+                  </Text>
+                  <Text fontSize="13px">@{data.tweet.author.name}</Text>
+                </Stack>
+              </HStack>
+              <Stack marginBottom="20px">
+                <Text fontSize="23px">{data.tweet.body}</Text>
+              </Stack>
+              <Stack borderBottom="1px solid rgb(239, 243, 244)">
+                <Text color="rgb(83, 100, 113)" margin="10px 0 10px 0">
+                  {formatRelative(
+                    subDays(new Date(data.tweet.createdAt), 3),
+                    new Date()
+                  )}
+                </Text>
+              </Stack>
+              <HStack
+                borderBottom="1px solid rgb(239, 243, 244)"
+                paddingBottom="10px"
+              >
+                <Text as="b">{data.tweet.likes.length}</Text>
+                <Text>Likes</Text>
+              </HStack>
+              <HStack
+                borderBottom="1px solid rgb(239, 243, 244)"
+                as={Flex}
+                justify="space-around"
+              >
+                <Stack
+                  padding="4px"
+                  borderRadius="full"
+                  onClick={() => {
+                    onOpen();
+                    setModalState({
+                      photo: meData.me.Profile?.photo,
+                      name: data.tweet.author.name,
+                      tid: Number(tid),
+                      tbody: data.tweet.body,
+                      aphoto: data.tweet.author.Profile.photo,
+                      tTime: formatDistance(
+                        subDays(new Date(data.tweet.createdAt), 0),
+                        new Date()
+                      ),
+                    });
+                  }}
+                  _hover={{
+                    color: "rgb(66, 179, 224)",
+                    backgroundColor: "rgb(178, 230, 251)",
+                  }}
+                >
+                  <CommentIcon />
+                </Stack>
+                <Stack _hover={{ color: "rgb(249, 24, 128)" }}>
+                  {meData.me.likedTweets
+                    .map((tweett: likedTweet) => tweett.tweet.id)
+                    .includes(Number(tid)) ? (
+                    <HStack>
+                      <DeleteButton
+                        id={
+                          meData.me.likedTweets.filter(
+                            (l: any) => l.tweet.id === Number(tid)
+                          )[0].id
+                        }
+                      />
+                      <Text color="rgb(249, 24, 128)">
+                        {data.tweet.likes.length}
+                      </Text>
+                    </HStack>
+                  ) : (
+                    <HStack>
+                      <LikeButton id={Number(tid)} />{" "}
+                      <Text>{data.tweet.likes.length}</Text>
+                    </HStack>
+                  )}
+                </Stack>
+              </HStack>
+            </Stack>
+          </Stack>
+          <Stack borderBottom="1px solid rgb(239, 243, 244)">
+            <Formik
+              initialValues={InitialValues}
+              onSubmit={async (values, { setSubmitting,resetForm }) => {
+                setSubmitting(true);
+                await createReply({
+                  variables: { ...values, tweetId: Number(tid) },
+                });
+
+                setSubmitting(false);
+                resetForm({values: InitialValues})
+              }}
+            >
+              <Stack as={Form}>
+                <Stack>
+                  <Stack>
+                    <HStack
+                      as={Flex}
+                      padding="12px 16px 0 16px"
+                      align="flex-start"
+                    >
+                      <Stack as={Flex} w="60px" h="100%" flexGrow="0">
+                        <Image
+                          src={meData.me.Profile?.photo}
+                          boxSize="50px"
+                          borderRadius="full"
+                        />
+                      </Stack>
+                      <TweetInput
+                        name="body"
+                        label="body"
+                        type="body"
+                        placeholder="Tweet your reply"
+                      />
+                    </HStack>
+                    <Stack
+                      as={Flex}
+                      align="flex-end"
+                      w="100%"
+                      marginTop="0"
+                      padding="6px"
+                    >
+                      <Button
+                        variant="outline"
+                        color="white"
+                        backgroundColor="#1D9BF0"
+                        type="submit"
+                        borderRadius="full"
+                        w="fit-content"
+                      >
+                        <Text as="b">Reply</Text>
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </Formik>
+          </Stack>
+          <Stack>
+            {data.tweet.replies?.map((reply: Reply, i: number) => (
+              <Stack
+                w="100%"
+                borderBottom="1px solid rgb(239, 243, 244)"
+                key={i}
+                marginTop="0.1rem"
+                padding="12px 16px 0 16px"
+              >
+                <HStack as={Flex} align="flex-start">
+                  <Image
+                    src={reply.user.Profile.photo}
+                    boxSize="40px"
+                    borderRadius="full"
+                  />
+
+                  <VStack w="100%">
+                    <HStack as={Flex} align="flex-start" w="100%">
+                      <Text as="b">{reply.user.name}</Text>
+                      <Text>
+                        {formatDistance(
+                          subDays(new Date(reply.createdAt), 0),
+                          new Date()
+                        )}{" "}
+                        ago
+                      </Text>
+                    </HStack>
+                    <Stack as={Flex} align="flex-start" w="100%">
+                      <Text>Replying to @{data.tweet.author.name}</Text>
+                    </Stack>
+                    <Stack as={Flex} justify="flex-start" w="100%">
+                      <Text overflowWrap="anywhere">{reply.body}</Text>
+                    </Stack>
+                    <HStack w="100%" as={Flex} justify="space-around">
+                      {/* <Stack
+                          padding="4px"
+                          borderRadius="full"
+                          onClick={() => {
+                            onOpen();
+                            setModalState({
+                              photo: meData.me.Profile?.photo,
+                              name: tweet.author.name,
+                              tid: tweet.id,
+                              tbody: tweet.body,
+                              aphoto: tweet.author.Profile.photo,
+                              tTime: formatDistance(
+                                subDays(new Date(tweet.createdAt), 0),
+                                new Date()
+                              ),
+                            });
+                          }}
+                          _hover={{
+                            color: "rgb(66, 179, 224)",
+                            backgroundColor: "rgb(178, 230, 251)",
+                          }}
+                        >
+                          <CommentIcon />
+                        </Stack> */}
+                    </HStack>
+                  </VStack>
+                </HStack>
+              </Stack>
+            ))}
+            <CreateReplyInTweetPage
+              isOpen={isOpen}
+              onClose={onClose}
+              photo={modalState.photo}
+              name={modalState.name}
+              tid={modalState.tid}
+              tbody={modalState.tbody}
+              aphoto={modalState.aphoto}
+              tTime={modalState.tTime}
+            />
           </Stack>
         </GridItem>
       </Grid>

@@ -63,7 +63,6 @@ const CreateReplyInTweetPage = ({
   const closeModal = useCallback(() => {
     onClose();
   }, [onClose]);
-  console.log(tid);
   return (
     <Modal isOpen={isOpen} onClose={closeModal} isCentered={true} size="lg">
       <ModalOverlay />
@@ -104,13 +103,14 @@ const CreateReplyInTweetPage = ({
         </Stack>
         <Formik
           initialValues={InitialValues}
-          onSubmit={async (values, { setSubmitting }) => {
+          onSubmit={async (values, { setSubmitting,resetForm }) => {
             setSubmitting(true);
             await createReply({
               variables: { ...values, tweetId: tid },
             });
             
             setSubmitting(false);
+            resetForm({values: InitialValues})
           }}
         >
           <Stack as={Form} justify="center">

@@ -23,7 +23,7 @@ const ProtectedRoutes = ({ children }: Props) => {
   // console.log(error);
   // if (error) return <p>{error.message}</p>;
   // if (!data) return <Navigate to="/login" />;
-  console.log(error)
+  // console.log(error)
   if (loading)
     return (
       <Stack justify="center" align="center" w="100%" h="100vh">

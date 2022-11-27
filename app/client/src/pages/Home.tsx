@@ -66,13 +66,15 @@ const Home = () => {
             <Stack borderBottom="1px solid rgb(239, 243, 244)">
               <Formik
                 initialValues={InitialValues}
-                onSubmit={async (values, { setSubmitting }) => {
+                onSubmit={async (values, { setSubmitting, resetForm }) => {
                   setSubmitting(true);
                   await createTweet({
                     variables: values,
                   });
-                  console.log(values);
+                  
+                  // console.log(values);
                   setSubmitting(false);
+                  resetForm({values: InitialValues})
                 }}
               >
                 <Stack as={Form}>

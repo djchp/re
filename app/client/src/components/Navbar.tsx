@@ -177,13 +177,15 @@ const Navbar = () => {
           
         >
           {navbarIcons ? (
-            <Stack w="100%" as={Flex} align="center">
+            <Stack w="100%" as={Flex} align="center" justify="center" h="100%">
               <Text color="white" as="b" w="fit-content">
                 Tweet
               </Text>
             </Stack>
           ) : (
-            <ModeEditOutlineOutlinedIcon />
+            <Stack w="100%" as={Flex} align="center" justify="center" h="100%">
+              <ModeEditOutlineOutlinedIcon />
+            </Stack>
           )}
         </Stack>
         <Spacer />

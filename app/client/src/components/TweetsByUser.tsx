@@ -108,7 +108,6 @@ const TweetsByUser = ({ userId }: Props) => {
   //       lData.me.likedTweets.filter((l: any) => l.tweet.id === tweet.id)[0]
   //   )
   // );
-  console.log(data)
   return (
     <Stack as={Flex}>
       {data.tweetsbyuser?.map((tweet: Tweet, i: number) => (
